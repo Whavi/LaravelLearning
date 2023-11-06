@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inscription</title>
+    <script src="../testmdp.js" defer></script>
+</head>
+<body>
+<form method="POST" action="/save" id="myForm">
+    <h1>Formulaire d'inscription</h1>
+    <input type="text" name="email" placeholder="Email" required>
+    <input type="text" name="Login" placeholder="Login" required>
+    <input type="text" name="Tel" placeholder="Téléphone" required>
+    <input type="password" name="motDePasse" id="motDePasse" placeholder="Mot De Passe" required>
+    <span id="passwordError" style="color: red;"></span>
+    <br>
+    <button type="submit" id="submitBtn">Soumettre</button>
+</form>
+</body>
+</html>
