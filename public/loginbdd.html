@@ -8,10 +8,25 @@
 <form method = 'POST' action = '/login'>
     <input type="text" name="Login" placeholder="Login">
     <input type="password" name="motDePasse" placeholder="Mot De Passe">
-    <input type="submit" name="authentification">
-
-
+    <button type="submit">Connexion</button>
 </form>
+
+<style>
+form input, button {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 6px;
+    margin-bottom: 16px;
+}
+
+input[type=submit] {
+    background-color: #04AA6D;
+    color: white;
+    }
+</style>
 
 </body>
 </html>

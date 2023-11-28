@@ -3,18 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <title>Inscription</title>
-    <script src="../testmdp.js" defer></script>
 </head>
 <body>
-<form method="POST" action="/save" id="myForm">
+<form method="POST" action="/save">
     <h1>Formulaire d'inscription</h1>
-    <input type="text" name="email" placeholder="Email" required>
+    <input type="email" name="email" placeholder="Email" required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}">
     <input type="text" name="Login" placeholder="Login" required>
-    <input type="text" name="Tel" placeholder="Téléphone" required>
-    <input type="password" name="motDePasse" id="motDePasse" placeholder="Mot De Passe" required>
+    <input type="text" name="Tel" placeholder="Téléphone" required patern ="[0-9]+">
+    <input type="password" name="motDePasse" placeholder="Mot de Passe" id="motDePasse" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$">
+
+
     <span id="passwordError" style="color: red;"></span>
     <br>
-    <button type="submit" id="submitBtn">Soumettre</button>
+    <button type="submit">Soumettre</button>
+
+
+    <div id="message">
+        <h3>Le mot de passe doit avoir :</h3>
+        <p id="letter" class="invalid">Une lettre en <b>minuscule</b></p>
+        <p id="capital" class="invalid">Une lettre en <b>capital </b> </p>
+        <p id="number" class="invalid"><b>Un chiffre</b></p>
+        <p id="carac" class="invalid"><b>Un caractère spécial</b></p>
+        <p id="length" class="invalid">Minimum <b>8 characters</b></p>
+    </div>
+
 </form>
+
+
+<script>
+    let myInput = document.getElementById("motDePasse");
+    let letter = document.getElementById("letter");
+    let capital = document.getElementById("capital");
+    let number = document.getElementById("number");
+    let carac = document.getElementById("carac");
+    let length = document.getElementById("length");
+
+
+    myInput.onfocus = function() {
+        document.getElementById("message").style.display = "block";
+    }
+
+    myInput.onblur = function() {
+        document.getElementById("message").style.display = "none";
+    }
+
+    myInput.onkeyup = function() {
+        let lowerCaseLetters = /[a-z]/g;
+        if(myInput.value.match(lowerCaseLetters)) {
+            letter.classList.remove("invalid");
+            letter.classList.add("valid");
+        } else {
+            letter.classList.remove("valid");
+            letter.classList.add("invalid");
+        }
+        let upperCaseLetters = /[A-Z]/g;
+        if(myInput.value.match(upperCaseLetters)) {
+            capital.classList.remove("invalid");
+            capital.classList.add("valid");
+        } else {
+            capital.classList.remove("valid");
+            capital.classList.add("invalid");
+        }
+
+        let numbers = /[0-9]/g;
+        if(myInput.value.match(numbers)) {
+            number.classList.remove("invalid");
+            number.classList.add("valid");
+        } else {
+            number.classList.remove("valid");
+            number.classList.add("invalid");
+        }
+
+        if(myInput.value.length >= 8) {
+            length.classList.remove("invalid");
+            length.classList.add("valid");
+        } else {
+            length.classList.remove("valid");
+            length.classList.add("invalid");
+        }
+
+        let caracs = /[-_@&~"'`,.=*+?^!§$"[\]{}()|\\]/g;
+        if(myInput.value.match(caracs)) {
+            carac.classList.remove("invalid");
+            carac.classList.add("valid");
+        } else {
+            carac.classList.remove("valid");
+            carac.classList.add("invalid");
+        }
+    }
+</script>
+
+<style>
+    form input, button {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        margin-top: 6px;
+        margin-bottom: 16px;
+    }
+
+    input[type=submit] {
+        background-color: #04AA6D;
+        color: white;
+    }
+
+    #message {
+        display:none;
+        background: #f1f1f1;
+        color: #000;
+        position: relative;
+        padding: 20px;
+        margin-top: 10px;
+    }
+
+    #message p {
+        padding: 10px 35px;
+        font-size: 18px;
+    }
+
+    #message .valid {
+        color: green;
+    }
+
+    #message .valid:before {
+        position: relative;
+        left: -35px;
+
+    }
+
+
+    #message .invalid {
+        color: red;
+    }
+
+    #message .invalid:before {
+        position: relative;
+        left: -35px;
+
+    }
+</style>
 </body>
 </html>

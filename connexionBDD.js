@@ -5,7 +5,6 @@ import {genereChaineAleatoire} from "./grain_de_sel.mjs";
 
 
 const require = createRequire(import.meta.url);
-const argon2 = require('argon2');
 const path = require('path');
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,10 +12,17 @@ const bodyParser = require('body-parser');
 const mysql = require("mysql2/promise");
 const express = require('express');
 const app = express();
+const session = require('express-session');
+const FileStore = require('session-file-store')(session);
+const cookieParser = require('cookie-parser');
 
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: false}))
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
+app.use(express.static(path.join(__dirname, 'static')));
 
 
 const connection = await mysql.createConnection({
@@ -25,6 +31,39 @@ const connection = await mysql.createConnection({
     database:'nodemysql'
 })
 
+let fileStoreOptions = {};
+app.use(session({
+    store: new FileStore(fileStoreOptions),
+    name:'CookiePerout',
+    secret:'Les SIO font toujours dodo',
+    resave: false,
+    saveUninitialized:false
+}));
+
+app.get('/compteur', (req, res)=> {
+    let cpt = typeof  req.session.cpt==='undefined' ? req.session.cpt = 1 : req.session.cpt+=1;
+    let logOrNot = req.session.loggedin===undefined ? false: req.session.loggedin;
+    let sessionId = req.sessionID;
+    let username = req.session.Login;
+    res.send(`<h1> Bonjour les rigolos vous etes venus ${cpt} ${logOrNot}</h1>
+              <br>
+              <h1>Salut ${username} ton ID de Session Unique : ${sessionId}</h1>
+              <h1><a href="/destroyLog">Quitter la session et aller en login</a></h1>
+              <br><h1><a href="/destroy">Quitter la session et rester dans le compteur</a></h1>`)
+    console.log(req.session.cookie)
+})
+
+app.get('/destroy', (req, res, err)=> {
+    req.session.destroy((err) => {
+        res.redirect('/compteur') // will always fire after session is destroyed
+    })
+})
+
+app.get('/destroyLog', (req, res, err)=> {
+    req.session.destroy((err) => {
+        res.redirect('/login') // will always fire after session is destroyed
+    })
+})
 
 app.get('/', (req, res)=> {
     res.send('Accueil du site')
@@ -51,7 +90,8 @@ app.post("/login", async ( req, res)=>{
     try {
         const [user] = await connection.query('SELECT * FROM inscription WHERE login = ?', [username]);
         if (user.length === 0) {
-            res.status(401).send('Nom d\'utilisateur non trouvé');
+            console.log('Nom d\'utilisateur non trouvé')
+            res.status(401).send('Login ou mdp invalide');
             return;
         }
 
@@ -60,14 +100,17 @@ app.post("/login", async ( req, res)=>{
 
         if (sha.motDePasseHash === user[0].MotDePasse) {
             console.log("Ca marche, redirection...")
-            res.redirect('/');
+            req.session.loggedin = true;
+            req.session.Login = username;
+            res.redirect('/compteur');
         } else {
             console.log("MDP Invalide...")
-            res.redirect('/login');
+            //res.redirect('/login');
+            res.status(401).send('Login ou mdp invalide');
         }
     } catch (error) {
         console.error(error);
-        res.status(500).send('Erreur.');
+        res.status(500).send('Login ou mdp invalide');
     }
 });
 
@@ -111,5 +154,5 @@ app.post('/save', async ( req, res)=>{
 
 
 app.listen(3000,()=>{
-    console.log('http://localhost:3000/login');
+    console.log('http://localhost:3000/form');
 });
